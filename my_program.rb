@@ -9,8 +9,7 @@ puts "========================================"
 
 puts "Where are you?"
 
-#user_location = gets.chomp
-user_location = "Gleacher Center"
+user_location = gets.chomp
 
 gmaps_url = "https://maps.googleapis.com/maps/api/geocode/json?address=#{user_location}&key=#{ENV.fetch("GMAPS_KEY")}"
 
@@ -37,18 +36,20 @@ parsed_ds_response = JSON.parse(raw_ds_response)
 
 current_temp_hash = parsed_ds_response.fetch("currently")
 current_temp = current_temp_hash.fetch("temperature")
+current_summary = current_temp_hash.fetch("summary")
 
 hourly_temp_hash = parsed_ds_response.fetch("hourly")
 hourly_temp_data = hourly_temp_hash.fetch("data")
 
 puts "It is currently #{current_temp}°F."
+puts "Next hour: #{current_summary} for the hour."
 
-
-counter = 0
-while counter < 12
+counter = 1
+while counter <= 12
   epoch_time = hourly_temp_data[counter].fetch("time")
-  hours_from = (Time.at(epoch_time) - Time.now) / 3600
-  p "In #{hours_from} hours"
-  p "there is a #{hourly_temp_data[counter].fetch("precipProbability")}% chance of precipitation."
+  probability = hourly_temp_data[counter].fetch("precipProbability")*100
+  puts "In #{counter} hours, there is a #{probability}% chance of precipitation."
   counter = counter + 1
 end
+
+puts "You might want to take an umbrella!"
